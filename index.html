@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List App Unniquess</title>
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        /* Hero Section Styles */
+        .hero {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        /* Todo List Styles */
+        .todo-list {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .todo-list h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .todo-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .todo-list li {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .todo-list li:last-child {
+            border-bottom: none;
+        }
+        .todo-list li span {
+            font-weight: bold;
+        }
+        /* Form Styles */
+        .form {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form input[type="text"] {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .form button[type="submit"] {
+            width: 100%;
+            height: 40px;
+            padding: 10px;
+            font-size: 18px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .form button[type="submit"]:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Todo List App Unniquess</h1>
+        <p>Simple Todo List App using Backend API</p>
+    </div>
+    <div class="todo-list">
+        <h2>Todo List</h2>
+        <ul id="todo-list">
+            <!-- Todo List Items will be rendered here -->
+        </ul>
+    </div>
+    <div class="form">
+        <h2>Add Todo</h2>
+        <input type="text" id="todo-input" placeholder="Enter Todo">
+        <button type="submit" id="add-todo-btn">Add Todo</button>
+    </div>
+
+    <script>
+        // Get Todo List and Form Elements
+        const todoList = document.getElementById('todo-list');
+        const todoInput = document.getElementById('todo-input');
+        const addTodoBtn = document.getElementById('add-todo-btn');
+
+        // Add Event Listener to Add Todo Button
+        addTodoBtn.addEventListener('click', () => {
+            // Get Todo Text from Input Field
+            const todoText = todoInput.value.trim();
+
+            // Check if Todo Text is not empty
+            if (todoText !== '') {
+                // Create New Todo List Item
+                const newTodo = document.createElement('li');
+                newTodo.textContent = todoText;
+
+                // Add New Todo List Item to Todo List
+                todoList.appendChild(newTodo);
+
+                // Send Request to Backend API to Save Todo
+                fetch('http://localhost:5602/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'save',
+                        task: todoText
+                    })
+                })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error(error));
+
+                // Clear Todo Input Field
+                todoInput.value = '';
+            }
+        });
+
+        // Get Todos from Backend API and Render them in Todo List
+        fetch('http://localhost:5602/process', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'list'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Loop through Todos and Render them in Todo List
+            data.forEach(todo => {
+                const newTodo = document.createElement('li');
+                newTodo.textContent = todo.task;
+
+                // Add New Todo List Item to Todo List
+                todoList.appendChild(newTodo);
+            });
+        })
+        .catch(error => console.error(error));
+    </script>
+</body>
+</html>
